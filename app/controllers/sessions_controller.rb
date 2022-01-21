@@ -1,4 +1,3 @@
-
 class SessionsController < ApplicationController
   def new
   end
@@ -8,12 +7,18 @@ class SessionsController < ApplicationController
     if user && user.authenticate(params[:session][:password])
       # log user
       helpers.log_in user
-      params[:session][:remember_me] == '1' ? helpers.remember(user) : helpers.forget(user)
-      redirect_to user
+      params[:session][:remember_me] == "1" ? helpers.remember(user) : helpers.forget(user)
+      redirect_back_or user
+      # redirect_to user
     else
-      flash.now[:danger] = 'Invalid email/password combination'
-      render 'new'
+      flash.now[:danger] = "Invalid email/password combination"
+      render "new"
     end
+  end
+
+  def redirect_back_or(default)
+    redirect_to(session[:forwarding_url] || default)
+    session.delete(:forwarding_url)
   end
 
   def destroy
